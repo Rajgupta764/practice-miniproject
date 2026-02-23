@@ -1,9 +1,22 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import './task.css'
 const Task = () => {
 
     const [input,setInput]=useState('');
-    const [list,setList]=useState([]);
+    const isFirstRender = useRef(true);
+    const [list,setList]=useState(() => {
+        const savedTasks = localStorage.getItem('tasks');
+        return savedTasks ? JSON.parse(savedTasks) : [];
+    });
+
+    // Save tasks to localStorage whenever list changes (but skip first render)
+    useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
+        localStorage.setItem('tasks', JSON.stringify(list));
+    }, [list]);
 
     const handle=()=>{
         if(input.trim() !== '') {
